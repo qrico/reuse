@@ -1,0 +1,7 @@
+[setup]
+mailserver= imap.gmail.com
+keywords= printerRRR, hewfewfijj, laptopRRR
+excluded_keywords= khjhkjh, hhkjkhjhj, amllllllll, broken
+username=oliver.k.yeh@gmail.com
+[memory]
+replied_mail_ids= 8329, 2893, 

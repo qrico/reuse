@@ -1,0 +1,22 @@
+README
+
+This program, autoReuse, will periodically check your email mailbox for messages from specific people with specific 
+keywords.  The program will then auto respond for you with a prewritten message.  If you are waiting for an laptop to appear on reuse,
+this program will claim the item for you so that you do not have to check your email every couple minutes.
+
+AutoReuse only reads emails that has not been opened yet.  This acts as a control that prevents
+autoReuse from sending duplicate responses for the same email.  If you mark an email message as unread, a duplicate
+message may be regenerated. 
+
+In the Config file("config.txt"), the following information needs to be filed in.  
+
+mailserver:  the imap server address of your mail account.  It is usually imap.(youremailprovider).com
+username:  The username of your email account.  The password will be asked for separately.  
+keywords:  Keywords that the program use to filter the email messages.  Keywords need to be separated by a comma and a space character.  
+excluded_keywords:  Keywords that should not be included in the file.
+
+In the TempateFile("ReuseTemplate.txt), the auto-generated response template is needed.  
+
+  
+1. enter in username 
+2.  
