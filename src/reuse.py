@@ -3,7 +3,7 @@ Created on Mar 11, 2011
 
 @author: yeho
 '''
-import imaplib, ConfigParser, getpass,re,smtplib, time
+import imaplib, configparser, getpass,re,smtplib, time
 from datetime import date
 from email.mime.text import MIMEText
 
@@ -17,7 +17,7 @@ def read_keywords_from_config_File():
     global excluded_keywords
     global keywords
     global M #imap mailbox
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     ##debug  print o.readlines()
     config.read('config.txt')
     ##server address of the mailserver
@@ -49,10 +49,10 @@ def read_keywords_from_config_File():
         
 def searchThroughUnreadMail():
     if (debug==True):
-        print "Today's Date is " + str(date.today())
-        print "Hostname is " + hostname
-        print "The keywords are " + keywords
-        print "The excluded keywords are " + excluded_keywords
+        print("Today's Date is " + str(date.today()))
+        print( "Hostname is " + hostname)
+        print( "The keywords are " + str(keywords))
+        print( "The excluded keywords are " + str(excluded_keywords))
     M.select()
     searchstring = "(UNSEEN)"
     if len(keywords)<1:
@@ -69,11 +69,11 @@ def searchThroughUnreadMail():
         for word in excluded_keywords:
             searchstring=searchstring + " (NOT (BODY \"" +word +"\"))"
     if (debug==True):    
-        print "The IMAP search string is " + searchstring
+        print( "The IMAP search string is " + searchstring)
         
     typ, searchResult = M.search(None, searchstring)
     if (debug==True):    
-        print "search result" + str(searchResult)
+        print( "search result" + str(searchResult))
     if len(searchResult) >0:
         searchResult=searchResult[0].split()
     
@@ -85,8 +85,8 @@ def searchThroughUnreadMail():
         if len(wholeEmail)<0:
             raise StandardError("email header parsing failed")
         if (debug==True): 
-            print wholeEmail
-            print wholeEmail[0][1]
+            print( wholeEmail)
+            print( wholeEmail[0][1])
         #  FROM: "Oliver Yeh" <oliver.k.yeh@gmail.com>
         #  FROM: oliver.k.yeh@gmail.com
         emailRegex= re.compile("([^<>\s]+@[^<>\s\r\\n]+)")
@@ -99,12 +99,12 @@ def searchThroughUnreadMail():
     
     
 def sendReply(sender, subject):
-    print sender
-    print subject
+    print( sender)
+    print( subject)
     file=open("ReuseTemplate.txt")
     msg=MIMEText(file.read())
     file.close()
-    print msg
+    print( msg)
     msg['Subject']=subject
     msg['From']= username
     msg['To']= sender
@@ -121,7 +121,7 @@ def sendReply(sender, subject):
 if __name__ == '__main__':
     read_keywords_from_config_File()
     while True:
-        print keywords
+        print( keywords)
         searchThroughUnreadMail()
         time.sleep(5)
         
