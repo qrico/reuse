@@ -16,10 +16,12 @@ def read_keywords_from_config_File():
     global password
     global excluded_keywords
     global keywords
+    global config
     global M #imap mailbox
     config = configparser.ConfigParser()
     ##debug  print o.readlines()
     config.read('config.txt')
+    
     ##server address of the mailserver
     hostname= config.get('setup', 'mailserver')
     
@@ -46,7 +48,26 @@ def read_keywords_from_config_File():
             raise StandardError('keyword length too short')
     M = imaplib.IMAP4_SSL(hostname, 993)
     M.login(username, password)
+
+def isARepeat(byte):
+    #checks to see if the id num is a repeat already stored in 'memory'.
+    #if it is not, it adds it to the memory.
+    ids = config.get('memory', 'replied_mail_ids' )
+    id_list = ids.strip(', ').split(', ')
+    print(id_list)
+    if byte.decode() in id_list:
+        print("Found duplicate email!")
+        return True
+    else:
+        config.set('memory', 'replied_mail_ids', ids + " " + byte.decode() + ",")
+        with open('config.txt', 'w') as configfile:
+            config.write(configfile)
         
+        print(ids + byte.decode())
+        return False
+        
+        
+    
 def searchThroughUnreadMail():
     if (debug==True):
         print("Today's Date is " + str(date.today()))
@@ -78,24 +99,28 @@ def searchThroughUnreadMail():
         searchResult=searchResult[0].split()
     
     ##sample (UNSEEN) (OR (BODY "computer") (BODY "laptop"))
-
+    
+    
     for Id in searchResult:
-        typ, wholeEmail = M.fetch(Id, '(BODY[HEADER.FIELDS (FROM SUBJECT)])')
-        
-        if len(wholeEmail)<0:
-            raise StandardError("email header parsing failed")
-        if (debug==True): 
-            print( wholeEmail)
-            print( wholeEmail[0][1])
-        #  FROM: "Oliver Yeh" <oliver.k.yeh@gmail.com>
-        #  FROM: oliver.k.yeh@gmail.com
-        emailRegex= re.compile("([^<>\s]+@[^<>\s\r\\n]+)")
-        subjectRegex= re.compile("Subject:([^\r\n]+)")
-        subject=subjectRegex.findall(wholeEmail[0][1])
-        sender=emailRegex.findall(wholeEmail[0][1])
-        if len(subject)<1:
-            raise StandardError("No subject")
-        sendReply(sender[0],subject[0])
+        #Id is convienetly in bytes
+        #check to see if it is in memory
+        if not(isARepeat(Id)):
+            typ, wholeEmail = M.fetch(Id, '(BODY[HEADER.FIELDS (FROM SUBJECT)])')
+            
+            if len(wholeEmail)<0:
+                raise StandardError("email header parsing failed")
+            if (debug==True): 
+                print( wholeEmail)
+                print( wholeEmail[0][1])
+            #  FROM: "Oliver Yeh" <oliver.k.yeh@gmail.com>
+            #  FROM: oliver.k.yeh@gmail.com
+            emailRegex= re.compile("([^<>\s]+@[^<>\s\r\\n]+)")
+            subjectRegex= re.compile("Subject:([^\r\n]+)")
+            subject=subjectRegex.findall(wholeEmail[0][1].decode())
+            sender=emailRegex.findall(wholeEmail[0][1].decode())
+            if len(subject)<1:
+                raise StandardError("No subject")
+            sendReply(sender[0],subject[0])
     
     
 def sendReply(sender, subject):
